@@ -1,0 +1,445 @@
+/* ==========================================================================
+   LoginLegacyFacebook.css - Diseno de login estilo Facebook (2011), NAVEGADORES ANTIGUOS
+   Mismo aspecto que LoginFacebook.css pero solo con CSS "clasico":
+   floats e inline-block en vez de flex, sin gap, sin variables, sin calc(),
+   sin transform/transition obligatorios, degradados con color solido de respaldo
+   y prefijos -webkit- / -moz-.
+   login.html carga este archivo cuando el navegador no soporta CSS moderno.
+   Si cambias algo aqui, replicalo en LoginFacebook.css.
+   ========================================================================== */
+
+html, body { margin: 0; padding: 0; }
+
+body {
+    min-width: 320px;
+    background: #fff;
+    color: #333;
+    font: 11px/14px "lucida grande", tahoma, verdana, arial, sans-serif;
+    text-align: left;
+}
+
+a { color: #3b5998; text-decoration: none; cursor: pointer; }
+a:hover { text-decoration: underline; }
+
+/* ---------- Barra azul superior ---------- */
+#blueBar {
+    height: 41px;
+    background: #3b5998;
+    border-bottom: 1px solid #133783;
+}
+#blueBarInner {
+    position: relative;
+    -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;
+    max-width: 981px;
+    height: 41px;
+    margin: 0 auto;
+    padding: 0 10px;
+    overflow: hidden;
+}
+#fbLogo {
+    float: left;
+    margin-right: 14px;
+    color: #fff;
+    font: bold 28px/41px "lucida grande", tahoma, verdana, arial, sans-serif;
+    letter-spacing: -1.5px;
+    text-shadow: 0 1px 0 #29447e;
+}
+#fbLogo:hover { text-decoration: none; }
+
+#fbSearchBox {
+    position: relative;
+    float: left;
+    -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;
+    width: 400px;
+    max-width: 45%;
+    height: 22px;
+    margin-top: 9px;
+    padding: 0 34px 0 8px;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid #1d3c78;
+    color: #777;
+    font: 11px/20px "lucida grande", tahoma, verdana, arial, sans-serif;
+    white-space: nowrap;
+}
+#fbSearchBtn {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 26px;
+    height: 20px;
+    border-left: 1px solid #ccd0d9;
+    background: #f1f2f4 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Ccircle cx='6.5' cy='6.5' r='4.5' fill='none' stroke='%23666' stroke-width='2'/%3E%3Cpath d='M10 10l4.5 4.5' stroke='%23666' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat 6px 3px;
+}
+
+#fbNav {
+    float: right;
+    color: #fff;
+    font-weight: bold;
+    white-space: nowrap;
+}
+#fbNav span {
+    float: left;
+    padding: 0 8px;
+    line-height: 41px;
+}
+.fbAvatar {
+    -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;
+    width: 26px;
+    height: 26px;
+    border: 1px solid #29447e;
+    background: #d8dfea url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 26 26'%3E%3Ccircle cx='13' cy='10' r='5' fill='%238b9dc3'/%3E%3Cpath d='M3 26c0-7 4-10 10-10s10 3 10 10z' fill='%238b9dc3'/%3E%3C/svg%3E") no-repeat 0 0;
+    -webkit-background-size: 100% 100%;
+    background-size: 100% 100%;
+    line-height: 0;
+}
+#fbNav .fbAvatar { float: left; margin: 7px 6px 0 0; padding: 0; }
+
+/* ---------- Pagina ---------- */
+#fbCanvas {
+    -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 26px 20px 30px;
+    text-align: center;
+}
+
+.dc-header { margin-bottom: 18px; }
+.dc-header img {
+    display: block;
+    width: 200px;
+    max-width: 60%;
+    height: auto;
+    margin: 0 auto 4px;
+}
+.dc-header p {
+    min-height: 18px;
+    margin: 0;
+    color: #55cc88;
+    font: 13px/18px "lucida grande", tahoma, verdana, arial, sans-serif;
+    letter-spacing: 1px;
+}
+
+/* ---------- Ventana tipo Facebook ---------- */
+#fbDialog {
+    -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;
+    max-width: 440px;
+    margin: 10px auto 0;
+    background: #fff;
+    border: 1px solid #555;
+    -webkit-box-shadow: 0 0 0 10px rgba(82, 82, 82, 0.7);
+    -moz-box-shadow: 0 0 0 10px rgba(82, 82, 82, 0.7);
+    box-shadow: 0 0 0 10px rgba(82, 82, 82, 0.7);
+    text-align: left;
+    font-size: 13px;
+}
+
+.fbDialogHeader {
+    padding: 6px 10px 7px;
+    background: #6d84b4;
+    border-bottom: 1px solid #3b5998;
+    color: #fff;
+    font: bold 14px/17px "lucida grande", tahoma, verdana, arial, sans-serif;
+}
+
+.fbDialogContent { padding: 14px 16px; }
+.fbNotice { margin: 0; padding-bottom: 0; color: #555; }
+.fbLabel { display: block; margin-bottom: 10px; color: #333; }
+
+.fbRow { overflow: hidden; zoom: 1; }
+.fbRow + .fbRow { margin-top: 12px; }
+.fbRow img { float: left; height: 27px; margin-right: 6px; }
+.fbRow .fbAvatar { float: left; width: 27px; height: 27px; margin-right: 6px; }
+.fbRow label { float: left; margin-right: 8px; line-height: 27px; }
+
+select {
+    -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;
+    height: 27px;
+    padding: 2px 5px;
+    background: #fff;
+    border: 1px solid #bdc7d8;
+    -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px;
+    color: #000;
+    font: 13px "lucida grande", tahoma, verdana, arial, sans-serif;
+}
+select:focus { outline: 0; border-color: #4f6aa3; }
+#USERID      { float: left; width: 90%; }
+#GAMEVERSION { float: left; width: 260px; max-width: 60%; }
+
+.fbDialogFooter {
+    padding: 8px 10px;
+    overflow: hidden;
+    zoom: 1;
+    background: #f2f2f2;
+    border-top: 1px solid #ccc;
+}
+.fbDialogFooter .delete-link { float: left; line-height: 24px; }
+.fbDialogFooter .login-btn  { float: right; }
+
+.delete-link { color: #b33; font-size: 12px; }
+
+#loginForm + .fbNewIsland { border-top: 1px solid #e5e5e5; }
+.fbNewIsland { color: #333; }
+#newIslandLink { font-weight: bold; }
+
+/* ---------- Botones ---------- */
+.login-btn {
+    display: inline-block;
+    margin: 0;
+    padding: 3px 9px 4px;
+    background: #5b74a8;
+    border: 1px solid #29447e;
+    border-bottom-color: #1a356e;
+    color: #fff;
+    font: bold 12px/14px "lucida grande", tahoma, verdana, arial, sans-serif;
+    cursor: pointer;
+}
+.login-btn:hover  { background: #4f6aa3; }
+.login-btn:active { background: #3b5998; }
+.login-btn.cancel {
+    background: #eceff5;
+    border-color: #999 #999 #888;
+    color: #333;
+}
+.login-btn.cancel:hover { background: #e2e6ee; }
+.login-btn.danger { background: #c0392b; border-color: #922b21 #922b21 #7b241c; }
+.login-btn.danger:hover { background: #a93226; }
+
+/* ---------- Pie ---------- */
+#fbFooter {
+    -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 12px 20px 24px;
+    border-top: 1px solid #e5e5e5;
+    color: #808080;
+    font-size: 11px;
+    text-align: center;
+}
+
+/* ---------- Ventanas y avisos que crea login.html (JS) ---------- */
+.dc-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #fff;                     /* respaldo si no hay rgba */
+    background: rgba(255, 255, 255, 0.7);
+    z-index: 9997;
+}
+.dc-modal {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;
+    width: 380px;
+    margin: -110px 0 0 -190px;
+    background: #fff;
+    border: 1px solid #555;
+    -webkit-box-shadow: 0 0 0 10px rgba(82, 82, 82, 0.7);
+    -moz-box-shadow: 0 0 0 10px rgba(82, 82, 82, 0.7);
+    box-shadow: 0 0 0 10px rgba(82, 82, 82, 0.7);
+    color: #333;
+    font: 13px/18px "lucida grande", tahoma, verdana, arial, sans-serif;
+    text-align: left;
+}
+.dc-modal h2 {
+    margin: 0;
+    padding: 6px 10px 7px;
+    background: #6d84b4;
+    border-bottom: 1px solid #3b5998;
+    color: #fff;
+    font: bold 14px/17px "lucida grande", tahoma, verdana, arial, sans-serif;
+}
+.dc-modal p, .dc-modal div { margin: 0; padding: 14px 16px; }
+.dc-modal div p { margin: 0 0 8px; padding: 0; }
+.dc-modal input { 
+    -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;
+    width: 100%;
+    height: 27px;
+    padding: 2px 5px;
+    border: 1px solid #bdc7d8;
+    font: 13px "lucida grande", tahoma, verdana, arial, sans-serif;
+}
+.dc-modal input:focus { outline: 0; border-color: #4f6aa3; }
+.dc-modal .dc-buttons {
+    padding: 8px 10px;
+    background: #f2f2f2;
+    border-top: 1px solid #ccc;
+    text-align: right;
+}
+.dc-modal .dc-buttons .login-btn { float: none; margin-left: 6px; }
+
+.dc-toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    width: 340px;
+    margin-left: -170px;                  /* centrado sin transform */
+    -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;
+    padding: 9px 12px;
+    background: #3b5998;
+    border: 1px solid #29447e;
+    color: #fff;
+    font: bold 13px/17px "lucida grande", tahoma, verdana, arial, sans-serif;
+    text-align: center;
+    visibility: hidden;
+    z-index: 9999;
+}
+.dc-toast.show  { visibility: visible; }
+.dc-toast.error { background: #c0392b; border-color: #922b21; }
+
+/* ---------- Pantallas chicas ---------- */
+@media (max-width: 640px) {
+    #fbSearchBox { display: none; }
+    #fbNav .fbHideSmall { display: none; }
+}
+@media (max-width: 420px) {
+    #fbCanvas { padding: 18px 16px 24px; }
+    .dc-modal { width: 92%; margin-left: -46%; }
+    .fbRow label { margin-right: 6px; }
+    #USERID { width: 75%; }
+    .dc-toast { width: 90%; margin-left: -45%; }
+}
+
+/* ==========================================================================
+   Avatar, idiomas del pie y chat con Markut
+   ========================================================================== */
+
+#fbUserName:empty { display: none; }
+
+/* ---------- Idiomas del pie (estilo Facebook 2015) ---------- */
+#fbFooter { padding-bottom: 44px; }
+#fbLangs { margin-bottom: 8px; color: #333; }
+.fbLangCur { color: #333; }
+#langMore {
+    display: inline-block;
+    width: 18px;
+    height: 14px;
+    border: 1px solid #bbb;
+    background: #f6f7f8;
+    color: #4b4f56;
+    font: bold 12px/13px Arial, sans-serif;
+    text-align: center;
+    vertical-align: middle;
+}
+#langMore:hover { background: #e9ebee; text-decoration: none; }
+.fbLangList a, .fbLangList b { display: block; padding: 7px 8px; }
+.fbLangList a:hover { background: #eceff5; text-decoration: none; }
+
+/* ---------- Fotos de perfil ---------- */
+.fbPic { display: block; overflow: hidden; border: 1px solid #ccc; background: #fff; }
+.fbPic img { display: block; width: 100%; height: 100%; }
+.fbPic24 { width: 24px; height: 24px; }
+.fbPic32 { width: 32px; height: 32px; }
+.fbPic.fbAvatar { border-color: #29447e; }
+
+/* ---------- Punto verde "en linea" ---------- */
+.fbDot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: #43b43b;
+    border: 1px solid #2f8e2a;
+    -webkit-border-radius: 50%; -moz-border-radius: 50%; border-radius: 50%;
+    vertical-align: middle;
+}
+
+/* ---------- Barra "Chat" abajo a la derecha ---------- */
+#fbChatBar {
+    position: fixed;
+    bottom: 0;
+    right: 20px;
+    -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;
+    width: 205px;
+    height: 27px;
+    padding: 0 8px;
+    background: #f6f7f8;
+    border: 1px solid #b8bcc4;
+    border-bottom: 0;
+    -webkit-border-radius: 3px 3px 0 0; -moz-border-radius: 3px 3px 0 0; border-radius: 3px 3px 0 0;
+    color: #333;
+    font: bold 11px/26px "lucida grande", tahoma, verdana, arial, sans-serif;
+    cursor: pointer;
+    z-index: 9000;
+}
+#fbChatBar:hover { background: #e9ebee; }
+#fbChatBar .fbDot { margin-right: 6px; }
+
+/* ---------- Lista de amigos ---------- */
+#fbChatList {
+    position: fixed;
+    bottom: 27px;
+    right: 20px;
+    -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;
+    width: 205px;
+    max-height: 260px;
+    overflow: auto;
+    background: #fff;
+    border: 1px solid #b8bcc4;
+    border-bottom: 0;
+    z-index: 9000;
+}
+.fbChatFriend { padding: 6px 8px; overflow: hidden; zoom: 1; cursor: pointer; }
+.fbChatFriend:hover { background: #eceff5; }
+.fbChatFriend .fbPic { float: left; margin-right: 8px; }
+.fbChatFriend .fbChatName { float: left; font-size: 11px; line-height: 26px; color: #333; }
+.fbChatFriend .fbDot { float: right; margin-top: 9px; }
+
+/* ---------- Ventana de chat ---------- */
+#fbChatWin {
+    position: fixed;
+    bottom: 27px;                         /* encima de la barra "Chat", sin tapar el formulario */
+    right: 20px;
+    -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;
+    width: 270px;
+    background: #fff;
+    border: 1px solid #777;
+    -webkit-box-shadow: 0 0 5px rgba(0, 0, 0, 0.35); -moz-box-shadow: 0 0 5px rgba(0, 0, 0, 0.35); box-shadow: 0 0 5px rgba(0, 0, 0, 0.35);
+    z-index: 9001;
+}
+#fbChatWinHead {
+    padding: 6px 8px;
+    overflow: hidden;
+    zoom: 1;
+    background: #6d84b4;
+    border-bottom: 1px solid #3b5998;
+    color: #fff;
+    font: bold 12px/16px "lucida grande", tahoma, verdana, arial, sans-serif;
+}
+#fbChatWinHead .fbDot { margin-right: 6px; }
+#fbChatClose { float: right; color: #fff; font-size: 17px; line-height: 15px; cursor: pointer; opacity: 0.8; }
+#fbChatClose:hover { opacity: 1; }
+#fbChatLog {
+    height: 256px;
+    overflow: auto;
+    padding: 8px;
+    background: #fff;
+    color: #333;
+    font: 11px/15px "lucida grande", tahoma, verdana, arial, sans-serif;
+    text-align: left;
+}
+.fbMsg { overflow: hidden; zoom: 1; margin-bottom: 8px; }
+.fbMsg .fbPic { float: left; }
+.fbMsgBody { margin-left: 40px; word-wrap: break-word; }
+.fbMsgName { display: block; color: #3b5998; }
+.fbMsgText a { color: #3b5998; }
+.fbMsgTime { margin-top: 4px; color: #999; font-size: 10px; }
+.fbEmoji { width: 16px; height: 16px; vertical-align: -3px; }
+#fbChatInputWrap { padding: 5px; background: #f6f7f8; border-top: 1px solid #ccc; }
+#fbChatInput {
+    -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;
+    width: 100%;
+    height: 24px;
+    padding: 2px 6px;
+    background: #fff;
+    border: 1px solid #bdc7d8;
+    color: #999;
+    font: 11px "lucida grande", tahoma, verdana, arial, sans-serif;
+}
+
+@media (max-width: 520px) {
+    #fbChatBar, #fbChatList { right: 8px; }
+    #fbChatWin { left: 8px; right: 8px; width: auto; }
+}
