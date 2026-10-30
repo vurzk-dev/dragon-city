@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Dragon City</title>
+    <link rel="icon" type="image/png" href="img/logo2.png">
+    <script>
+    (function () {
+        var modern = false;
+        try {
+            modern = !!(window.CSS && CSS.supports &&
+                        CSS.supports("aspect-ratio", "1 / 1") &&
+                        CSS.supports("inset", "0") &&
+                        CSS.supports("margin-inline", "auto") &&
+                        CSS.supports("selector(:focus-visible)"));
+        } catch (e) { modern = false; }
+
+        var forced = /[?&]css=(legacy|modern)(&|$)/.exec(window.location.search);
+        if (forced) modern = (forced[1] === "modern");
+
+        var file = modern ? "LoginFacebook.css" : "LoginLegacyFacebook.css";
+        document.write('<link rel="stylesheet" href="css/' + file + '">');
+        document.documentElement.className += (document.documentElement.className ? " " : "") +
+                                              (modern ? "css-modern" : "css-legacy");
+    }());
+    </script>
+    <noscript><link rel="stylesheet" href="css/LoginLegacyFacebook.css"></noscript>
+</head>
+<body class="fbLoginPage">
+
+    <div id="blueBar">
+        <div id="blueBarInner">
+            <a id="fbLogo" href="/">facebook</a>
+            <div id="fbSearchBox"><span data-i18n="login.search">Search for people, places and things</span><span id="fbSearchBtn"></span></div>
+            <div id="fbNav">
+                <span class="fbAvatar"></span>
+                <span id="fbUserName" class="fbHideSmall"></span>
+                <span class="fbHideSmall" data-i18n="login.find_friends">Find Friends</span>
+                <span data-i18n="login.home">Home</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="fbCanvas">
+        <div class="dc-header">
+            <img src="img/logo4.png" alt="Dragon City Logo"/>
+            <p id="versionLabel"></p>
+        </div>
+
+        <div id="fbDialog">
+            <div class="fbDialogHeader">Dragon City</div>
+
+            <p id="noSaves" class="fbDialogContent fbNotice" style="display:none;"><span data-i18n="login.nosaves_a">No saves found in</span> <b>web/srv/</b><span data-i18n="login.nosaves_b">. Create your first Island!</span></p>
+
+            <form method="post" id="loginForm" style="display:none;">
+                <div class="fbDialogContent">
+                    <b class="fbLabel" data-i18n="login.select_island">Select your Island</b>
+                    <div class="fbRow">
+                        <span class="fbAvatar"></span>
+                        <select id="USERID" name="USERID" required></select>
+                    </div>
+                </div>
+                <div class="fbDialogFooter">
+                    <a href="#" id="deleteLink" class="delete-link" title="Delete the selected Island and its save" data-i18n-title="login.delete_hint" data-i18n="login.delete">Delete Island</a>
+                    <button type="submit" class="login-btn" data-i18n="login.login">Log in</button>
+                </div>
+            </form>
+
+            <div class="fbDialogContent fbNewIsland">
+                <span id="orText" style="display:none;"><span data-i18n="login.or">Or</span> </span><a href="/new.html" id="newIslandLink" data-i18n="login.create_island">Create a new Island</a>
+            </div>
+        </div>
+    </div>
+
+    <div id="fbFooter">
+        <div id="fbLangs"></div>
+        <div id="fbFooterLinks"><span data-i18n="login.privacy">Privacy</span> &middot; <span data-i18n="login.terms">Terms</span> &middot; <span data-i18n="login.help">Help</span></div>
+    </div>
+
+    <div id="fbChat">
+        <div id="fbChatWin" style="display:none;">
+            <div id="fbChatWinHead">
+                <span id="fbChatClose" title="Close" data-i18n-title="chat.close">&times;</span>
+                <span class="fbDot"></span><b id="fbChatWinName">Markut</b>
+            </div>
+            <div id="fbChatLog"></div>
+            <div id="fbChatInputWrap"><input type="text" id="fbChatInput" disabled="disabled" placeholder="Replies are not available here" data-i18n-placeholder="chat.placeholder"/></div>
+        </div>
+        <div id="fbChatList" style="display:none;">
+            <div class="fbChatFriend" id="fbChatFriend"><span class="fbChatName">Markut</span><span class="fbDot"></span></div>
+        </div>
+        <div id="fbChatBar"><span class="fbDot"></span><span data-i18n="chat.title">Chat</span> (1)</div>
+    </div>
+
+<script>
+(function () {
+    "use strict";
+
+    function pad2(n) { return (n < 10 ? "0" : "") + n; }
+    function logMsg(level, tag, message) {
+        var ts = new Date();
+        var stamp = ts.getFullYear() + "-" + pad2(ts.getMonth() + 1) + "-" + pad2(ts.getDate()) +
+                    " " + pad2(ts.getHours()) + ":" + pad2(ts.getMinutes()) + ":" + pad2(ts.getSeconds());
+        var line = "[" + level + "] [" + stamp + "] " + tag + " " + message;
+        if (level === "ERROR" || level === "CRITICAL") console.error(line);
+        else if (level === "WARNING") console.warn(line);
+        else console.log(line);
+    }
+
+    function byId(id) { return document.getElementById(id); }
+
+    var profiles = [];
+    var selectedIndex = null;
+    var pendingDeleteIndex = null;
+    var profilesLoaded = false;
+
+    var DEFAULT_SWF = "Base_sec_0.6.0.swf";
+
+    function request(method, url, body, done) {
+        var xhr = new XMLHttpRequest();
+        xhr.open(method, url);
+        if (body) xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.onload = function () {
+            var data = null;
+            try { data = JSON.parse(xhr.responseText); } catch (e) { return done(new Error("Respuesta no valida (HTTP " + xhr.status + ")"), null); }
+            done(null, data);
+        };
+        xhr.onerror = function () { done(new Error("sin conexion con " + url), null); };
+        xhr.send(body ? JSON.stringify(body) : null);
+    }
+
+    var toastTimer = null;
+    function showToast(msg, isError) {
+        var t = byId("toast");
+        if (!t) {
+            t = document.createElement("div");
+            t.id = "toast";
+            document.documentElement.appendChild(t);
+        }
+        t.textContent = msg;
+        t.className = "dc-toast" + (isError ? " error" : "");
+        void t.offsetWidth;
+        t.className += " show";
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () { t.className = t.className.replace(" show", ""); }, 2800);
+    }
+
+    function closeModal() {
+        var m = byId("dcModal");
+        if (m) m.parentNode.removeChild(m);
+    }
+    function openModal(title, contentNode, buttons) {
+        closeModal();
+        var overlay = document.createElement("div");
+        overlay.id = "dcModal";
+        overlay.className = "dc-overlay";
+        var box = document.createElement("div");
+        box.className = "dc-modal";
+        var h2 = document.createElement("h2");
+        h2.textContent = title;
+        box.appendChild(h2);
+        box.appendChild(contentNode);
+        var row = document.createElement("div");
+        row.className = "dc-buttons";
+        buttons.forEach(function (b) {
+            var btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "login-btn" + (b.cls ? " " + b.cls : "");
+            btn.textContent = b.label;
+            btn.onclick = b.onClick;
+            row.appendChild(btn);
+        });
+        box.appendChild(row);
+        overlay.appendChild(box);
+        document.documentElement.appendChild(overlay);
+    }
+
+    function loadServerVersion(done) {
+        request("GET", "/version", null, function (err, data) {
+            if (err || !data || !data.version_c) {
+                if (done) done();
+                return;
+            }
+            var text = (data.version_n ? data.version_n + " " : "") + data.version_c;
+            serverVersionText = text;
+            byId("versionLabel").textContent = text;
+            if (done) done();
+        });
+    }
+
+    function generateFbSigUser() {
+        return Math.floor(1000000000000 + Math.random() * 9000000000000).toString();
+    }
+
+    function loadProfilesFromServer() {
+        request("GET", "/list_players", null, function (err, data) {
+            if (err) {
+                profiles = [];
+            } else if (!data.saves || Object.prototype.toString.call(data.saves) !== "[object Array]") {
+                profiles = [];
+            } else {
+                profiles = data.saves.map(function (s) {
+                    return {
+                        name:        s.name || "DragonMaster",
+                        fb_sig_user: String(s.pid || ""),
+                        level:       s.level || 1,
+                        xp:          s.xp,
+                        gold:        s.gold || 0,
+                        food:        s.food || 0,
+                        cash:        s.cash || 0,
+                        modified:    s.modified || 0
+                    };
+                }).filter(function (p) { return p.fb_sig_user; });
+            }
+
+            if (profiles.length > 0 && selectedIndex === null) selectedIndex = 0;
+            else if (profiles.length === 0) selectedIndex = null;
+            profilesLoaded = true;
+            renderProfiles();
+        });
+    }
+
+    function renderProfiles() {
+        if (!profilesLoaded) return;
+        var select = byId("USERID");
+        while (select.firstChild) select.removeChild(select.firstChild);
+
+        profiles.forEach(function (p, i) {
+            var o = document.createElement("option");
+            o.value = p.fb_sig_user;
+            o.title = p.fb_sig_user;
+            var hasXp = p.xp !== undefined && p.xp !== null;
+            o.textContent = hasXp ? tr("login.option", "{name} ~ level {level} ({xp} xp)", { name: p.name, level: p.level || 1, xp: p.xp })
+                                  : tr("login.option_noxp", "{name} ~ level {level}", { name: p.name, level: p.level || 1 });
+            if (i === selectedIndex) o.selected = true;
+            select.appendChild(o);
+        });
+
+        var has = profiles.length > 0;
+        byId("loginForm").style.display = has ? "" : "none";
+        byId("orText").style.display    = has ? "inline" : "none";
+        byId("noSaves").style.display   = has ? "none" : "";
+        updateTopName();
+    }
+
+    function selectProfile(i) {
+        selectedIndex = i;
+        updateTopName();
+    }
+
+    function deleteProfile(i) {
+        var profile = profiles[i];
+        if (!profile) return;
+        pendingDeleteIndex = i;
+
+        var p = document.createElement("p");
+        p.textContent = tr("login.delete_msg", 'Delete the Island "{name}"? Its saved game in web/srv/ will be deleted too.', { name: profile.name });
+
+        openModal(tr("login.delete_modal_title", "Delete Island"), p, [
+            { label: tr("login.cancel", "Cancel"), cls: "cancel", onClick: cancelDeleteProfile },
+            { label: tr("login.delete_btn", "Delete"), cls: "danger", onClick: confirmDeleteProfile }
+        ]);
+    }
+
+    function cancelDeleteProfile() {
+        pendingDeleteIndex = null;
+        closeModal();
+    }
+
+    function confirmDeleteProfile() {
+        var i = pendingDeleteIndex;
+        if (i === null) return;
+        var profile = profiles[i];
+        closeModal();
+
+        request("POST", "/delete_profile", { user_id: profile.fb_sig_user }, function (err, result) {
+            if (err) {
+                showToast(tr("login.toast_unreachable", "Could not reach the server, the Island was removed from the list only"), true);
+            } else if (result.status === "ok") {
+                if (result.deleted) {
+                    showToast(tr("login.toast_deleted", 'Island "{name}" and its save were deleted', { name: profile.name }));
+                } else {
+                    showToast(tr("login.toast_deleted_nosave", 'Island "{name}" deleted (it had no saved game)', { name: profile.name }));
+                }
+            } else {
+                showToast(tr("login.toast_server_err", "Server error while deleting, the Island was removed from the list only"), true);
+            }
+
+            profiles.splice(i, 1);
+            if (selectedIndex === i) selectedIndex = profiles.length > 0 ? 0 : null;
+            else if (selectedIndex !== null && selectedIndex > i) selectedIndex--;
+            pendingDeleteIndex = null;
+            renderProfiles();
+        });
+    }
+
+    function hideModal() { closeModal(); }
+
+    function createNewUser() {
+        var wrap = document.createElement("div");
+        var label = document.createElement("p");
+        var labelB = document.createElement("b");
+        labelB.textContent = tr("login.player_name", "Player name");
+        label.appendChild(labelB);
+        var input = document.createElement("input");
+        input.type = "text";
+        input.id = "player_name";
+        input.placeholder = tr("login.placeholder", "e.g. Carlos");
+        input.onkeydown = function (e) {
+            if (e.keyCode === 13) { e.preventDefault(); saveNewUser(); }
+            else if (e.keyCode === 27) hideModal();
+        };
+        wrap.appendChild(label);
+        wrap.appendChild(input);
+
+        openModal(tr("login.new_title", "New Island"), wrap, [
+            { label: tr("login.cancel", "Cancel"), cls: "cancel", onClick: hideModal },
+            { label: tr("login.create", "Create"), onClick: saveNewUser }
+        ]);
+        input.focus();
+    }
+
+    function saveNewUser() {
+        var input = byId("player_name");
+        var name = input ? input.value.replace(/^\s+|\s+$/g, "") : "";
+        if (!name) {
+            alert(tr("login.enter_name", "Please enter a name for the player"));
+            return;
+        }
+
+        var fb_sig_user = generateFbSigUser();
+        profiles.push({ name: name, fb_sig_user: fb_sig_user, level: 1, gold: 0, food: 0, cash: 0, modified: 0 });
+        hideModal();
+
+        selectedIndex = profiles.length - 1;
+        renderProfiles();
+    }
+
+    function enterGame() {
+        if (selectedIndex === null || !profiles[selectedIndex]) return;
+
+        var profile = profiles[selectedIndex];
+        var gameUrl = "index.html?fb_sig_user=" + profile.fb_sig_user +
+                      "&player_name=" + encodeURIComponent(profile.name) +
+                      "&swf_version=" + encodeURIComponent(DEFAULT_SWF) +
+                      "&language=" + language;
+
+        window.location.href = gameUrl;
+    }
+
+    function each(list, fn) { Array.prototype.forEach.call(list, fn); }
+    function readStore(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
+    function writeStore(key, value) { try { localStorage.setItem(key, value); } catch (e) {} }
+
+    var LANG_KEY = "dragoncity_language";
+    var LANGS = [
+        { code: "en", name: "English (US)" },
+        { code: "es", name: "Espa\u00f1ol" }
+    ];
+    var language = "en";
+    var strings  = {};
+
+    function tr(key, fallback, vars) {
+        var s = strings.hasOwnProperty(key) ? strings[key] : fallback;
+        if (vars) for (var k in vars) if (vars.hasOwnProperty(k)) s = s.split("{" + k + "}").join(vars[k]);
+        return s;
+    }
+
+    function langExists(code) {
+        for (var i = 0; i < LANGS.length; i++) if (LANGS[i].code === code) return true;
+        return false;
+    }
+
+    function loadStrings(code, done) {
+        strings = {};
+        if (code === "en") return done();
+
+        function copy(data) { for (var k in data) if (data.hasOwnProperty(k)) strings[k] = data[k]; }
+        function fromScript() {
+            if (window.DC_IDIOMAS && window.DC_IDIOMAS[code]) { copy(window.DC_IDIOMAS[code]); return done(); }
+            var sc = document.createElement("script");
+            sc.src = "xmls/idiomas/" + code + ".js";
+            sc.onload  = function () { if (window.DC_IDIOMAS && window.DC_IDIOMAS[code]) copy(window.DC_IDIOMAS[code]); done(); };
+            sc.onerror = function () { done(); };
+            document.getElementsByTagName("head")[0].appendChild(sc);
+        }
+
+        if (window.location.protocol === "file:") return fromScript();
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "xmls/idiomas/" + code + ".xml");
+        xhr.onload = function () {
+            if (xhr.status < 200 || xhr.status >= 300) return fromScript();
+            var doc = new DOMParser().parseFromString(xhr.responseText, "application/xml");
+            if (doc.getElementsByTagName("parsererror").length) return fromScript();
+            each(doc.getElementsByTagName("texto"), function (n) {
+                strings[n.getAttribute("id")] = n.textContent.replace(/^\s+|\s+$/g, "");
+            });
+            done();
+        };
+        xhr.onerror = fromScript;
+        xhr.send();
+    }
+
+    var TR_ATTRS = ["title", "placeholder"];
+    function applyTranslations() {
+        each(document.querySelectorAll("[data-i18n]"), function (el) {
+            if (el.__en === undefined) el.__en = el.textContent;
+            var k = el.getAttribute("data-i18n");
+            el.textContent = strings.hasOwnProperty(k) ? strings[k] : el.__en;
+        });
+        TR_ATTRS.forEach(function (attr) {
+            each(document.querySelectorAll("[data-i18n-" + attr + "]"), function (el) {
+                var store = "__en_" + attr;
+                if (el[store] === undefined) el[store] = el.getAttribute(attr);
+                var k = el.getAttribute("data-i18n-" + attr);
+                el.setAttribute(attr, strings.hasOwnProperty(k) ? strings[k] : el[store]);
+            });
+        });
+    }
+
+    function renderLanguageBar() {
+        var box = byId("fbLangs");
+        while (box.firstChild) box.removeChild(box.firstChild);
+
+        var ordered = LANGS.filter(function (l) { return l.code === language; })
+                           .concat(LANGS.filter(function (l) { return l.code !== language; }));
+
+        ordered.forEach(function (l, i) {
+            if (i > 0) box.appendChild(document.createTextNode(" \u00b7 "));
+            if (l.code === language) {
+                var cur = document.createElement("span");
+                cur.className = "fbLangCur";
+                cur.textContent = l.name;
+                box.appendChild(cur);
+            } else {
+                var a = document.createElement("a");
+                a.href = "#";
+                a.textContent = l.name;
+                a.onclick = function (e) { e.preventDefault(); setLanguage(l.code); };
+                box.appendChild(a);
+            }
+        });
+
+        var more = document.createElement("a");
+        more.href = "#";
+        more.id = "langMore";
+        more.textContent = "+";
+        more.title = tr("login.more_languages", "Show more languages");
+        more.onclick = function (e) { e.preventDefault(); openLanguageDialog(); };
+        box.appendChild(document.createTextNode(" "));
+        box.appendChild(more);
+    }
+
+    function openLanguageDialog() {
+        var list = document.createElement("div");
+        list.className = "fbLangList";
+        LANGS.forEach(function (l) {
+            if (l.code === language) {
+                var b = document.createElement("b");
+                b.textContent = l.name;
+                list.appendChild(b);
+            } else {
+                var a = document.createElement("a");
+                a.href = "#";
+                a.textContent = l.name;
+                a.onclick = function (e) { e.preventDefault(); closeModal(); setLanguage(l.code); };
+                list.appendChild(a);
+            }
+        });
+        openModal(tr("login.lang_title", "Select your language"), list, [
+            { label: tr("login.close", "Close"), cls: "cancel", onClick: closeModal }
+        ]);
+    }
+
+    function setLanguage(code, done) {
+        if (!langExists(code)) code = "en";
+        loadStrings(code, function () {
+            language = code;
+            writeStore(LANG_KEY, code);
+            document.documentElement.lang = code;
+            applyTranslations();
+            renderLanguageBar();
+            renderProfiles();
+            renderChat();
+            if (done) done();
+        });
+    }
+
+    function initialLanguage() {
+        var m = /[?&]language=([a-z]{2})(&|$)/i.exec(window.location.search);
+        var code = m ? m[1].toLowerCase() : readStore(LANG_KEY);
+        return code && langExists(code) ? code : "en";
+    }
+
+    function updateTopName() {
+        var el = byId("fbUserName");
+        var p = selectedIndex !== null ? profiles[selectedIndex] : null;
+        el.textContent = p ? p.name : "";
+    }
+
+    var CHAT_WELCOME_ONCE = false;
+    var CHAT_WELCOME_KEY  = "dragoncity_markut_welcome";
+    var CHAT_DELAY_MS     = 1200;
+
+    var MARKUT_AVATARS = ["avatars/markut.png", "avatars/markut.jpg", "avatars/markut.jpeg", "avatars/markut.webp"];
+    var CHAT_LINKS = [
+        { label: "GitHub",  url: "https://github.com/Dragon-City-Reborn" },
+        { label: "YouTube", url: "https://www.youtube.com/channel/UCH6pzoy_ha7EP2mYHtU1xcQ" },
+        { label: "Discord", url: "https://discord.gg/rc4VEcGSGG" }
+    ];
+    var CHAT_EN_INTRO = "Hi, I'm Markut, the Project Leader of Dragon City Reborn. I hope you have a lot of fun playing, and I remind you that the version you're playing is {version}. If you'd like to follow us, you can visit our official pages:";
+    var CHAT_EN_OUTRO = "Bye! I'll keep improving the game so you have fun";
+
+    var EMOJI_SMILE = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cdefs%3E%3CradialGradient id='g' cx='.4' cy='.3' r='.8'%3E%3Cstop offset='0' stop-color='%23ffe27a'/%3E%3Cstop offset='1' stop-color='%23f5a623'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='12' cy='12' r='11' fill='url(%23g)' stroke='%23d9890f' stroke-width='.8'/%3E%3Cellipse cx='8.3' cy='9.5' rx='1.4' ry='2' fill='%234a2c0a'/%3E%3Cellipse cx='15.7' cy='9.5' rx='1.4' ry='2' fill='%234a2c0a'/%3E%3Cpath d='M6.5 14.2c1.2 3.6 9.8 3.6 11 0' fill='none' stroke='%234a2c0a' stroke-width='1.8' stroke-linecap='round'/%3E%3C/svg%3E";
+
+    var serverVersionText = "";
+    var chatMessage = null;
+
+    function markutPic(sizeClass) {
+        var wrap = document.createElement("span");
+        wrap.className = "fbPic " + sizeClass;
+        var img = document.createElement("img");
+        var n = 0;
+        img.alt = "Markut";
+        img.onerror = function () {
+            n++;
+            if (n < MARKUT_AVATARS.length) { img.src = MARKUT_AVATARS[n]; return; }
+            if (img.parentNode) img.parentNode.removeChild(img);
+            wrap.className += " fbAvatar";
+        };
+        img.src = MARKUT_AVATARS[0];
+        wrap.appendChild(img);
+        return wrap;
+    }
+
+    function showChatList(show) { byId("fbChatList").style.display = show ? "block" : "none"; }
+    function showChatWin(show)  { byId("fbChatWin").style.display  = show ? "block" : "none"; }
+
+    function buildChat() {
+        var friend = byId("fbChatFriend");
+        friend.insertBefore(markutPic("fbPic24"), friend.firstChild);
+
+        byId("fbChatBar").onclick = function () {
+            var show = byId("fbChatList").style.display !== "block";
+            showChatList(show);
+            if (show) showChatWin(false);
+        };
+        friend.onclick = function () { showChatList(false); showChatWin(true); };
+        byId("fbChatClose").onclick = function () { showChatWin(false); };
+    }
+
+    function renderChat() {
+        var log = byId("fbChatLog");
+        while (log.firstChild) log.removeChild(log.firstChild);
+        if (!chatMessage) return;
+
+        var row = document.createElement("div");
+        row.className = "fbMsg";
+        row.appendChild(markutPic("fbPic32"));
+
+        var body = document.createElement("div");
+        body.className = "fbMsgBody";
+
+        var name = document.createElement("b");
+        name.className = "fbMsgName";
+        name.textContent = "Markut";
+        body.appendChild(name);
+
+        var text = document.createElement("div");
+        text.className = "fbMsgText";
+        text.appendChild(document.createTextNode(tr("chat.msg_intro", CHAT_EN_INTRO, {
+            version: serverVersionText || tr("chat.version_unknown", "unknown")
+        })));
+        CHAT_LINKS.forEach(function (l) {
+            text.appendChild(document.createElement("br"));
+            text.appendChild(document.createTextNode(l.label + ": "));
+            var a = document.createElement("a");
+            a.href = l.url;
+            a.target = "_blank";
+            a.rel = "noopener noreferrer";
+            a.textContent = l.url;
+            text.appendChild(a);
+        });
+        text.appendChild(document.createElement("br"));
+        text.appendChild(document.createElement("br"));
+        text.appendChild(document.createTextNode(tr("chat.msg_outro", CHAT_EN_OUTRO) + " "));
+        var emoji = document.createElement("img");
+        emoji.className = "fbEmoji";
+        emoji.alt = ":)";
+        emoji.src = EMOJI_SMILE;
+        text.appendChild(emoji);
+        body.appendChild(text);
+
+        var time = document.createElement("div");
+        time.className = "fbMsgTime";
+        time.textContent = chatMessage.time;
+        body.appendChild(time);
+
+        row.appendChild(body);
+        log.appendChild(row);
+        log.scrollTop = log.scrollHeight;
+    }
+
+    var pingDone = false;
+    function playPingOnce() {
+        var Ctx = window.AudioContext || window.webkitAudioContext;
+        if (!Ctx) return;
+        var ctx;
+        try { ctx = new Ctx(); } catch (e) { return; }
+
+        var events = ["pointerdown", "mousedown", "keydown", "touchstart", "click"];
+        function tones() {
+            if (pingDone) return;
+            pingDone = true;
+            events.forEach(function (ev) { document.removeEventListener(ev, unlock, true); });
+            [[1046.5, 0], [1568, 0.13]].forEach(function (n) {
+                var osc = ctx.createOscillator(), gain = ctx.createGain();
+                var t0 = ctx.currentTime + n[1];
+                osc.type = "sine";
+                osc.frequency.value = n[0];
+                gain.gain.setValueAtTime(0.0001, t0);
+                gain.gain.exponentialRampToValueAtTime(0.25, t0 + 0.02);
+                gain.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.22);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start(t0);
+                osc.stop(t0 + 0.25);
+            });
+        }
+        function unlock() {
+            var r = ctx.resume ? ctx.resume() : null;
+            if (r && r.then) r.then(tones); else tones();
+        }
+
+        if (ctx.state === "running") return tones();
+        events.forEach(function (ev) { document.addEventListener(ev, unlock, true); });
+        var r = ctx.resume ? ctx.resume() : null;
+        if (r && r.then) r.then(tones, function () {});
+    }
+
+    function deliverWelcome() {
+        var seen = CHAT_WELCOME_ONCE && readStore(CHAT_WELCOME_KEY) === "1";
+        var now = new Date();
+        chatMessage = { time: pad2(now.getHours()) + ":" + pad2(now.getMinutes()) };
+        renderChat();
+        writeStore(CHAT_WELCOME_KEY, "1");
+        if (seen) return;
+
+        showChatWin(true);
+        playPingOnce();
+    }
+
+    var welcomeParts = 0;
+    function welcomePartReady() {
+        welcomeParts++;
+        if (welcomeParts === 2) setTimeout(deliverWelcome, CHAT_DELAY_MS);
+    }
+
+    window.onload = function () {
+        buildChat();
+
+        byId("USERID").onchange = function () { selectProfile(this.selectedIndex); };
+        byId("loginForm").onsubmit = function (e) { e.preventDefault(); enterGame(); return false; };
+        byId("deleteLink").onclick = function (e) {
+            e.preventDefault();
+            deleteProfile(byId("USERID").selectedIndex);
+        };
+        byId("newIslandLink").onclick = function (e) { e.preventDefault(); createNewUser(); };
+
+        setLanguage(initialLanguage(), function () {
+            loadProfilesFromServer();
+            welcomePartReady();
+        });
+        loadServerVersion(welcomePartReady);
+    };
+}());
+</script>
+</body>
+</html>

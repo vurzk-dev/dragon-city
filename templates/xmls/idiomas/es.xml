@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Español (es) - Dragon City
+  Ubicacion: xmls/idiomas/es.xml
+  Cada <texto id="..."> reemplaza al elemento con data-i18n="..." (o data-i18n-title, -alt, -aria-label, -value).
+  Marcados con [captura] salen de la captura del original en español; el resto es traduccion propia.
+  En los textos con {n}, ese valor se reemplaza por el numero.
+-->
+<idioma codigo="es" nombre="Español">
+
+    <!-- Sesion -->
+    <texto id="session.welcome">Bienvenido</texto>
+    <texto id="session.level">Nivel</texto>
+    <texto id="session.logout">Cerrar sesión</texto>
+
+    <!-- Barra de botones [captura] -->
+    <texto id="menu.free_gifts">Regalos gratis</texto>
+    <texto id="menu.play">Jugar</texto>
+    <texto id="menu.get_gems">Obtener gemas</texto>
+    <texto id="menu.earn_gems">Ganar gemas</texto>
+    <texto id="menu.invite">Invitar</texto>
+    <texto id="menu.fan_page">Página de fans</texto>
+    <texto id="menu.forums">Foros</texto>
+    <texto id="menu.language">Idioma</texto>
+    <!-- En la captura el original tambien tenia estos dos; hoy no estan en la barra -->
+    <texto id="menu.gift_gems">Gemas de regalo</texto>
+    <texto id="menu.community">Comunidad</texto>
+
+    <!-- More Games -->
+    <texto id="crosspromo.label">Más juegos</texto>
+    <texto id="crosspromo.more_games">Más juegos</texto>
+
+    <!-- Juego -->
+    <texto id="game.flash_required">Se requiere Flash Player 11.0.0 o superior para jugar a Dragon City.</texto>
+
+    <!-- Banner (en la captura el titulo sigue en ingles) [captura] -->
+    <texto id="banner.title">Like Dragon City and Get Free Gifts!</texto>
+
+    <!-- Boton Me gusta [captura: "Me gusta"] -->
+    <texto id="like.button">Me gusta</texto>
+    <texto id="like.unlike">Ya no me gusta</texto>
+    <texto id="like.none">Sé el primero de tus amigos en indicar que te gusta esto.</texto>
+    <texto id="like.one">A 1 persona le gusta esto. Sé el primero de tus amigos.</texto>
+    <texto id="like.many">A {n} personas les gusta esto. Sé el primero de tus amigos.</texto>
+    <texto id="like.you">Te gusta esto.</texto>
+    <texto id="like.you_and_one">A ti y a 1 persona más les gusta esto.</texto>
+    <texto id="like.you_and_many">A ti y a {n} personas más les gusta esto.</texto>
+
+    <!-- Pie de pagina [captura] -->
+    <texto id="footer.privacy">Política de privacidad</texto>
+    <texto id="footer.terms">Condiciones de servicio</texto>
+    <texto id="footer.help">Ayuda</texto>
+    <texto id="footer.language_selection">Selección de idioma:</texto>
+    <texto id="footer.go">Ir</texto>
+
+    <!-- ===================== LOGIN (login.html) ===================== -->
+    <texto id="login.search">Buscar personas, lugares y cosas</texto>
+    <texto id="login.find_friends">Buscar amigos</texto>
+    <texto id="login.home">Inicio</texto>
+    <texto id="login.select_island">Selecciona tu isla</texto>
+    <texto id="login.game_version">Versión del juego:</texto>
+    <texto id="login.delete">Eliminar isla</texto>
+    <texto id="login.delete_hint">Elimina la isla seleccionada y su partida</texto>
+    <texto id="login.login">Iniciar sesión</texto>
+    <texto id="login.or">O</texto>
+    <texto id="login.create_island">Crear una isla nueva</texto>
+    <texto id="login.nosaves_a">No se encontraron partidas en</texto>
+    <texto id="login.nosaves_b">. ¡Crea tu primera isla!</texto>
+    <texto id="login.privacy">Privacidad</texto>
+    <texto id="login.terms">Términos</texto>
+    <texto id="login.help">Ayuda</texto>
+    <texto id="login.more_languages">Mostrar más idiomas</texto>
+    <texto id="login.lang_title">Elige tu idioma</texto>
+    <texto id="login.close">Cerrar</texto>
+    <texto id="login.cancel">Cancelar</texto>
+    <texto id="login.delete_btn">Eliminar</texto>
+    <texto id="login.delete_modal_title">Eliminar isla</texto>
+    <texto id="login.delete_msg">¿Eliminar la isla "{name}"? Su partida guardada en web/srv/ también se eliminará.</texto>
+    <texto id="login.new_title">Isla nueva</texto>
+    <texto id="login.player_name">Nombre del jugador</texto>
+    <texto id="login.placeholder">p. ej. Carlos</texto>
+    <texto id="login.create">Crear</texto>
+    <texto id="login.enter_name">Escribe un nombre para el jugador</texto>
+    <texto id="login.option">{name} ~ nivel {level} ({xp} xp)</texto>
+    <texto id="login.option_noxp">{name} ~ nivel {level}</texto>
+    <texto id="login.toast_deleted">La isla "{name}" y su partida fueron eliminadas</texto>
+    <texto id="login.toast_deleted_nosave">Isla "{name}" eliminada (no tenía partida guardada)</texto>
+    <texto id="login.toast_server_err">Error del servidor al eliminar; la isla solo se quitó de la lista</texto>
+    <texto id="login.toast_unreachable">No se pudo contactar con el servidor; la isla solo se quitó de la lista</texto>
+
+    <!-- ===================== CHAT con Markut ===================== -->
+    <texto id="chat.title">Chat</texto>
+    <texto id="chat.placeholder">Aquí no se pueden enviar respuestas</texto>
+    <texto id="chat.close">Cerrar</texto>
+    <texto id="chat.version_unknown">desconocida</texto>
+    <texto id="chat.msg_intro">Hola, soy Markut el Líder del Proyecto Dragon City Reborn, espero te diviertas mucho jugando y te recuerdo que la versión que estás jugando es {version}. Si deseas seguirnos en nuestras páginas oficiales puedes visitar:</texto>
+    <texto id="chat.msg_outro">chao, voy a seguir mejorando el juego para que te diviertas</texto>
+
+</idioma>
