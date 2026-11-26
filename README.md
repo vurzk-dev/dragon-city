@@ -13,7 +13,7 @@
 **Dragon City Reborn** nace con el objetivo de devolver a los fans el clásico **Dragon City**. liderado por vurzk-dev (Markut) El proyecto busca preservar la experiencia original del juego Flash, manteniendo viva la esencia del juego y, al mismo tiempo, continuar su desarrollo mediante nuevas mejoras y contenido.
 
 ---
-# Instalación:
+# Instalación 💾:
 
 ## Instalación sencilla:
 <!-- - Descarga un navegador compatible con Flash. 🔦 **Recomendado:** [FlashBrowser](https://github.com/radubirsan/FlashBrowser/releases/tag/v0.81) -->
