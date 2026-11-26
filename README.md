@@ -4,15 +4,13 @@
 
 </div>
 
-# Dragon City:
+# Dragon City
 [![Descargas](https://img.shields.io/github/downloads/vurzk-dev/dragon-city/total?label=downloads%40all)](../../releases/latest)
 [![Discord](https://img.shields.io/discord/1544079267388723200?logo=discord&label=Discord&color=blue)](https://discord.gg/rc4VEcGSGG)
 
-Si por alguna razón el widget no funciona, te puedes unir mediante este Enlace: https://discord.gg/rc4VEcGSGG
-
 # Nuestra Misión 🎯:
 
-**Dragon City** nace con el objetivo de devolver a los fans el clásico **Dragon City**. El proyecto busca preservar la experiencia original del juego Flash, manteniendo viva la esencia del juego y, al mismo tiempo, continuar su desarrollo mediante nuevas mejoras y contenido.
+**Dragon City Reborn** nace con el objetivo de devolver a los fans el clásico **Dragon City**. liderado por vurzk-dev (Markut) El proyecto busca preservar la experiencia original del juego Flash, manteniendo viva la esencia del juego y, al mismo tiempo, continuar su desarrollo mediante nuevas mejoras y contenido.
 
 ---
 # Instalación:
